@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  rediscache:
+    image: redis
+    container_name: rediscache
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_volume:/data
+  cleanarchitecturedb:
+    image: postgres
+    container_name: moviedb
+    restart : always
+    ports:
+      - 5432:5432
+    environment:
+      - "POSTGRES_PASSWORD=1283"
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+  webapi:
+    image: webapi
+    restart: always
+    build:
+      context: .
+      dockerfile: src/Presentation/WebAPI/Dockerfile
+    ports:
+      - "5010:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "ConnectionStrings:PostgreSqlConnection=User ID=postgres; Password=1283; Server=cleanarchitecturedb; Port=5432;Database=CleanArchitecture;Integrated Security=true;"
+      - "ConnectionStrings:SeriLogConnection=User ID=postgres; Password=1283; Server=cleanarchitecturedb; Port=5432;Database=CleanArchitecture;Integrated Security=true;"
+      - "CacheSettings:RedisURL=rediscache"
+      - "CacheSettings:Port=6379"
+      - "CacheSettings:PreferRedis=true"
+    
+      
+volumes:
+  redis_volume:
+  postgres_volume:

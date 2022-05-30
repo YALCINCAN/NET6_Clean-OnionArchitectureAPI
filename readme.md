@@ -15,7 +15,7 @@
 - Automapper
 - Docker
 - JWT Authentication,Refresh Token
-- Complete User Management  (Register /Forgot Password / Confirmation Mail) Without Identity
+- Complete User Management  (Register / Forgot Password / Confirmation Mail) Without Identity
 - Role Based Authorization
 - Database Seeding
 - Custom Exception Handling Middleware

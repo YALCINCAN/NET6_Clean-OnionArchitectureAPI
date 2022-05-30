@@ -1,8 +1,7 @@
 # NET6 Clean-Onion Architecture Project
 
 
-**<h2 align="center">Features</p>**
-
+## Features
 - .NET6
 - Entity Framework Core – Code First
 - Repository Pattern

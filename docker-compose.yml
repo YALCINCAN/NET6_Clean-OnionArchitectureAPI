@@ -11,7 +11,7 @@ services:
       - redis_volume:/data
   cleanarchitecturedb:
     image: postgres
-    container_name: moviedb
+    container_name: cleanarchitecturedb
     restart : always
     ports:
       - 5432:5432

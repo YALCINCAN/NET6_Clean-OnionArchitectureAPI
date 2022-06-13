@@ -1,5 +1,6 @@
 using Application;
 using FluentValidation.AspNetCore;
+using Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -55,7 +56,8 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     options.SuppressModelStateInvalidFilter = true;
 });
 builder.Services.AddApplicationServices();
-builder.Services.AddInfrastructreServices(builder.Configuration);
+builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddPersistenceServices(builder.Configuration);
 
 IDictionary<string, ColumnWriterBase> columnWriters = new Dictionary<string, ColumnWriterBase>
 {

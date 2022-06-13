@@ -1,4 +1,4 @@
-﻿using Persistence.Middleware;
+﻿using WebAPI.Infrastructure.Middleware;
 
 namespace WebAPI.Infrastructure.Extensions
 {

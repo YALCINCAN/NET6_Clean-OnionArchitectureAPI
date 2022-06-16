@@ -40,10 +40,17 @@ namespace Application.Handlers.Users.Commands
                 {
                     throw new ApiException(404, Messages.UserNotFound);
                 }
-                user.UserRoles = request.RoleIds.Select(roleid => new UserRole
+                if (request.RoleIds!=null)
                 {
-                    RoleId = roleid
-                }).ToList();
+                    user.UserRoles = request.RoleIds.Select(roleid => new UserRole
+                    {
+                        RoleId = roleid
+                    }).ToList();
+                }
+                else
+                {
+                    user.UserRoles = new List<UserRole>();
+                }
                 await _unitOfWork.SaveChangesAsync();
                 await _easyCacheService.RemoveByPrefixAsync("GetAuthenticatedUserWithRoles");
                 return new SuccessResponse(200, Messages.UserRolesUpdatedSuccessfully);

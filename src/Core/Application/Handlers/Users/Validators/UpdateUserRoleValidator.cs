@@ -13,7 +13,6 @@ namespace Application.Handlers.Users.Validators
         public UpdateUserRoleValidator()
         {
             RuleFor(x => x.UserId).NotEmpty().WithMessage("UserId is required");
-            RuleFor(x => x.RoleIds).Must(x => x.Count() > 0).WithMessage("RoleIds is required");
         }
     }
 }

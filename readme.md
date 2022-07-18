@@ -8,6 +8,7 @@
 - Repository Pattern
 - UnitOfWork Pattern
 - CQRS Pattern
+- Mediatr
 - CQRS Pipeline Caching (Redis,InMemory configure from appsettings.json file)
 - Response Wrappers
 - Fluent Validation

@@ -1,5 +1,5 @@
 ﻿using Application.Features.Users.Commands;
-using Application.Handlers.Users.Queries;
+using Application.Features.Users.Queries;
 using Application.Wrappers.Abstract;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

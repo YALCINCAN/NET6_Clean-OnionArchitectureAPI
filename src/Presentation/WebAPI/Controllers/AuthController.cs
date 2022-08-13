@@ -1,4 +1,4 @@
-﻿using Application.Handlers.Users.Commands;
+﻿using Application.Features.Users.Commands;
 using Application.Handlers.Users.Queries;
 using Application.Wrappers.Abstract;
 using MediatR;

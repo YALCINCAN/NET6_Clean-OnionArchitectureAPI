@@ -1,6 +1,6 @@
 ﻿using Application.Dtos;
-using Application.Handlers.Roles.Commands;
-using Application.Handlers.Users.Commands;
+using Application.Features.Roles.Commands;
+using Application.Features.Users.Commands;
 using AutoMapper;
 using Domain.Entities;
 using System;

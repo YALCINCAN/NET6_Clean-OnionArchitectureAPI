@@ -10,7 +10,7 @@ namespace Persistence.Context
 {
     public class CAContext : DbContext
     {
-        public CAContext(DbContextOptions options) : base(options)
+        public CAContext(DbContextOptions<CAContext> options) : base(options)
         {
             
         }

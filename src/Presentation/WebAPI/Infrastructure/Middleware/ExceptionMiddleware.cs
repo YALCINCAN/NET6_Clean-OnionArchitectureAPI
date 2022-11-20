@@ -65,7 +65,7 @@ namespace WebAPI.Infrastructure.Middleware
             {
                 Errors = exceptions,
             };
-            _logger.LogError("Beklenmeyen bir hata meydana geldi {@Error}", errorlogDetail);
+            _logger.LogError("Unknown error occurred {@Error}", errorlogDetail);
             var error = JsonConvert.SerializeObject(new ErrorResponse(httpContext.Response.StatusCode, message), new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
             return httpContext.Response.WriteAsync(error);
         }

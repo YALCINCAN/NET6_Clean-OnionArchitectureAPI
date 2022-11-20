@@ -3,7 +3,6 @@ using Application.Wrappers.Concrete;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using Serilog;
 using System.Net;
 
 namespace WebAPI.Infrastructure.Middleware
@@ -11,10 +10,12 @@ namespace WebAPI.Infrastructure.Middleware
     public class ExceptionMiddleware
     {
         private RequestDelegate _next;
+        private readonly ILogger<ExceptionMiddleware> _logger;
 
-        public ExceptionMiddleware(RequestDelegate next)
+        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext httpContext)
@@ -64,8 +65,7 @@ namespace WebAPI.Infrastructure.Middleware
             {
                 Errors = exceptions,
             };
-            var serializederror = JsonConvert.SerializeObject(errorlogDetail, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
-            Log.Error(serializederror);
+            _logger.LogError("Beklenmeyen bir hata meydana geldi {@Error}", errorlogDetail);
             var error = JsonConvert.SerializeObject(new ErrorResponse(httpContext.Response.StatusCode, message), new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
             return httpContext.Response.WriteAsync(error);
         }

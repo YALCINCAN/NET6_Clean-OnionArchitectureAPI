@@ -59,23 +59,13 @@ builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddPersistenceServices(builder.Configuration);
 
-IDictionary<string, ColumnWriterBase> columnWriters = new Dictionary<string, ColumnWriterBase>
-{
-    {"Message", new RenderedMessageColumnWriter(NpgsqlDbType.Text) },
-    {"Message_Template", new MessageTemplateColumnWriter(NpgsqlDbType.Text) },
-    {"Level", new LevelColumnWriter(true, NpgsqlDbType.Varchar) },
-    {"TimeStamp", new TimestampColumnWriter(NpgsqlDbType.Timestamp) },
-    {"Exception", new ExceptionColumnWriter(NpgsqlDbType.Text) },
-    {"Properties", new LogEventSerializedColumnWriter(NpgsqlDbType.Jsonb) },
-};
-
-
-
-var logConnectionString = builder.Configuration.GetConnectionString("SeriLogConnection");
-Log.Logger = new LoggerConfiguration()
+var Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
-    .WriteTo.PostgreSQL(connectionString: logConnectionString, tableName: "Logs", needAutoCreateTable: true, columnOptions: columnWriters)
     .CreateLogger();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(Logger);
 
 var app = builder.Build();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);

@@ -1,17 +1,19 @@
 ﻿using Application.Interfaces;
 using Application.Interfaces.Services;
 using MediatR;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Behaviors
 {
     public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
         private readonly IEasyCacheService _easyCacheService;
+        private readonly ILogger<CachingBehavior<TRequest, TResponse>> _logger;
 
-        public CachingBehavior(IEasyCacheService easyCacheService)
+        public CachingBehavior(IEasyCacheService easyCacheService, ILogger<CachingBehavior<TRequest, TResponse>> logger)
         {
             _easyCacheService = easyCacheService;
+            _logger = logger;
         }
 
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
@@ -31,12 +33,12 @@ namespace Application.Behaviors
                 if (cachedResponse != null)
                 {
                     response = (TResponse)cachedResponse;
-                    Log.Information($"Fetched from Cache -> '{cacheableQuery.CacheKey}'.");
+                    _logger.LogInformation($"Fetched from Cache -> '{cacheableQuery.CacheKey}'.");
                 }
                 else
                 {
                     response = await GetResponseAndAddToCache();
-                    Log.Information($"Added to Cache -> '{cacheableQuery.CacheKey}'.");
+                    _logger.LogInformation($"Added to Cache -> '{cacheableQuery.CacheKey}'.");
                 }
                 return response;
             }

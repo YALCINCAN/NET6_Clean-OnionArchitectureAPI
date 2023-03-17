@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data;
 
 namespace Application.Interfaces.Repositories
 {
@@ -10,5 +6,7 @@ namespace Application.Interfaces.Repositories
     {
         Task SaveChangesAsync();
         void SaveChanges();
+
+        IDbTransaction BeginTransaction();
     }
 }

@@ -8,8 +8,6 @@ using Application.Wrappers.Concrete;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using Microsoft.AspNetCore.WebUtilities;
-using System.Text;
 
 namespace Application.Features.Users.Commands
 {
@@ -39,12 +37,17 @@ namespace Application.Features.Users.Commands
 
             public async Task<IResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
             {
+                // Example transaction usage
+                // using var transaction = _unitOfWork.BeginTransaction();
+                //try
+                //{
                 var existuser = await _userRepository.GetAsync(x => x.UserName == request.UserName || x.Email == request.Email, noTracking: true);
                 if (existuser?.UserName == request.UserName)
                     throw new ApiException(400, Messages.UsernameIsAlreadyExist);
 
                 if (existuser?.Email == request.Email)
                     throw new ApiException(400, Messages.EmailIsAlreadyExist);
+
 
                 var (passwordHash, passwordSalt) = PasswordHelper.CreateHash(request.Password);
                 var user = _mapper.Map<User>(request);
@@ -53,10 +56,18 @@ namespace Application.Features.Users.Commands
                 user.EmailConfirmationCode = PasswordHelper.GenerateRandomString(20);
                 await _userRepository.AddAsync(user);
                 await _unitOfWork.SaveChangesAsync();
+                //transaction.Commit();
+
                 //string link = "http://localhost:8080/confirmemail/" + user.EmailConfirmationCode; if u use spa you must use this link example
                 string link = "http://localhost:5010/api/users/confirmemail/" + user.EmailConfirmationCode;
                 await _emailService.ConfirmationMailAsync(link, request.Email);
                 return new SuccessResponse(200, Messages.RegisterSuccessfully);
+                //}
+                //catch (Exception ex)
+                //{
+                //    transaction.Rollback();
+                //    // Logging ...
+                //}
             }
         }
     }

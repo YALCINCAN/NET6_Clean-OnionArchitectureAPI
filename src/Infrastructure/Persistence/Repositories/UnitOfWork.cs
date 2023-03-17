@@ -1,10 +1,7 @@
 ﻿using Application.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore.Storage;
 using Persistence.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Data;
 
 namespace Persistence.Repositories
 {
@@ -17,11 +14,17 @@ namespace Persistence.Repositories
             _context = context;
         }
 
+        public IDbTransaction BeginTransaction()
+        {
+            var transaction = _context.Database.BeginTransaction();
+            return transaction.GetDbTransaction();
+        }
+
         public void SaveChanges()
         {
             _context.SaveChanges();
         }
-        
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

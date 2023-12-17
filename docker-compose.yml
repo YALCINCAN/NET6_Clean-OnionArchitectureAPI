@@ -9,6 +9,17 @@ services:
       - "6379:6379"
     volumes:
       - redis_volume:/data
+  rabbitmq:
+    image: "rabbitmq:management"
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    depends_on:
+      rediscache:
+          condition: service_started
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq    
   cleanarchitecturedb:
     image: postgres
     container_name: cleanarchitecturedb
@@ -17,6 +28,11 @@ services:
       - 5432:5432
     environment:
       - "POSTGRES_PASSWORD=1283"
+    depends_on:
+      rediscache:
+          condition: service_started
+      rabbitmq:
+          condition: service_started
     volumes:
       - postgres_volume:/var/lib/postgresql/data
   webapi:
@@ -27,6 +43,10 @@ services:
       dockerfile: src/Presentation/WebAPI/Dockerfile
     ports:
       - "5010:80"
+    depends_on:
+      - cleanarchitecturedb
+      - rediscache
+      - rabbitmq
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "ConnectionStrings:PostgreSqlConnection=User ID=postgres; Password=1283; Server=cleanarchitecturedb; Port=5432;Database=CleanArchitecture;Integrated Security=true;"
@@ -34,8 +54,14 @@ services:
       - "CacheSettings:RedisURL=rediscache"
       - "CacheSettings:Port=6379"
       - "CacheSettings:PreferRedis=true"
+      - "RabbitMQSettings:HostName=rabbitmq"
+      - "RabbitMQSettings:UserName=guest"
+      - "RabbitMQSettings:Password=guest"
+      - "RabbitMQSettings:VirtualHost=/"
+      - "RabbitMQSettings:Port=5672"
     
       
 volumes:
   redis_volume:
   postgres_volume:
+  rabbitmq_data:

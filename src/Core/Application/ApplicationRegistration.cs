@@ -1,4 +1,5 @@
-﻿using Application.Behaviors;
+﻿using Application.BackgroundServices;
+using Application.Behaviors;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +16,15 @@ namespace Application
             services.AddAutoMapper(assm);
             services.AddMediatR(assm);
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
+
+            services.AddHostedService<ConfirmationMailSenderBackgroundService>();
+            services.AddHostedService<ForgetPasswordMailSenderBackgroundService>();
+            services.AddHostedService<ResetPasswordMailSenderBackgroundService>();
+
+
+
             services.AddValidatorsFromAssembly(assm);
         }
     }

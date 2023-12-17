@@ -1,5 +1,6 @@
 ﻿using Application.Features.Users.Commands;
 using Application.Features.Users.Queries;
+using Application.Interfaces.Services;
 using Application.Wrappers.Abstract;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -12,10 +13,12 @@ namespace WebAPI.Controllers
     public class AuthController : BaseController
     {
         private readonly IMediator _mediator;
+        private readonly ICacheService _cacheService;
 
-        public AuthController(IMediator mediator)
+        public AuthController(IMediator mediator, ICacheService cacheService)
         {
             _mediator = mediator;
+            _cacheService = cacheService;
         }
 
         [HttpGet]

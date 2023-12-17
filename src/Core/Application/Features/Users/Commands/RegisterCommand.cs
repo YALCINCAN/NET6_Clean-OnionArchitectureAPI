@@ -6,8 +6,11 @@ using Application.Interfaces.Services;
 using Application.Wrappers.Abstract;
 using Application.Wrappers.Concrete;
 using AutoMapper;
+using Common.Settings;
 using Domain.Entities;
+using Domain.RabbitMessages;
 using MediatR;
+using Microsoft.Extensions.Options;
 
 namespace Application.Features.Users.Commands
 {
@@ -25,14 +28,18 @@ namespace Application.Features.Users.Commands
             private readonly IUserRepository _userRepository;
             private readonly IUnitOfWork _unitOfWork;
             private readonly IEmailService _emailService;
+            private readonly IRabbitService _rabbitService;
+            private readonly RabbitMQSettings _rabbitMQSettings;
             private readonly IMapper _mapper;
 
-            public RegisterCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork, IEmailService emailService, IMapper mapper)
+            public RegisterCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork, IEmailService emailService, IMapper mapper, IRabbitService rabbitService, IOptions<RabbitMQSettings> rabbitMQSettings)
             {
                 _userRepository = userRepository;
                 _unitOfWork = unitOfWork;
                 _emailService = emailService;
                 _mapper = mapper;
+                _rabbitService = rabbitService;
+                _rabbitMQSettings = rabbitMQSettings.Value;
             }
 
             public async Task<IResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
@@ -60,7 +67,13 @@ namespace Application.Features.Users.Commands
 
                 //string link = "http://localhost:8080/confirmemail/" + user.EmailConfirmationCode; if u use spa you must use this link example
                 string link = "http://localhost:5010/api/users/confirmemail/" + user.EmailConfirmationCode;
-                await _emailService.ConfirmationMailAsync(link, request.Email);
+
+                _rabbitService.Publish<ConfirmationMailSendMessage>
+                    (new ConfirmationMailSendMessage()
+                    { Email = request.Email, Link = link },
+                    _rabbitMQSettings.EmailSenderRabbitMQSettings.Exchange_Default,
+                    _rabbitMQSettings.EmailSenderRabbitMQSettings.ConfirmationMailRabbitMQSettings.Queue_ConfirmationMailSender);
+                //await _emailService.ConfirmationMailAsync(link, request.Email);
                 return new SuccessResponse(200, Messages.RegisterSuccessfully);
                 //}
                 //catch (Exception ex)

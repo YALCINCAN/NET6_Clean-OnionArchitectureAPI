@@ -6,11 +6,6 @@ using Application.Wrappers.Abstract;
 using Application.Wrappers.Concrete;
 using Domain.Entities;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Features.Users.Commands
 {
@@ -24,13 +19,13 @@ namespace Application.Features.Users.Commands
         {
             private readonly IUserRepository _userRepository;
             private readonly IUnitOfWork _unitOfWork;
-            private readonly IEasyCacheService _easyCacheService;
+            private readonly ICacheService _cacheService;
 
-            public UpdateUserRoleCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork, IEasyCacheService easyCacheService)
+            public UpdateUserRoleCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork, ICacheService cacheService)
             {
                 _userRepository = userRepository;
                 _unitOfWork = unitOfWork;
-                _easyCacheService = easyCacheService;
+                _cacheService = cacheService;
             }
 
             public async Task<IResponse> Handle(UpdateUserRoleCommand request, CancellationToken cancellationToken)
@@ -52,7 +47,7 @@ namespace Application.Features.Users.Commands
                     user.UserRoles = new List<UserRole>();
                 }
                 await _unitOfWork.SaveChangesAsync();
-                await _easyCacheService.RemoveByPrefixAsync("GetAuthenticatedUserWithRoles");
+                await _cacheService.RemoveByPrefixAsync("GetAuthenticatedUserWithRoles");
                 return new SuccessResponse(200, Messages.UserRolesUpdatedSuccessfully);
             }
         }

@@ -10,6 +10,7 @@ COPY ["src/Presentation/WebAPI/WebAPI.csproj", "src/Presentation/WebAPI/"]
 COPY ["src/Infrastructure/Infrastructure/Infrastructure.csproj", "src/Infrastructure/Infrastructure/"]
 COPY ["src/Core/Application/Application.csproj", "src/Core/Application/"]
 COPY ["src/Core/Domain/Domain.csproj", "src/Core/Domain/"]
+COPY ["src/Core/Common/Common.csproj", "src/Core/Common/"]
 COPY ["src/Infrastructure/Persistence/Persistence.csproj", "src/Infrastructure/Persistence/"]
 RUN dotnet restore "src/Presentation/WebAPI/WebAPI.csproj"
 COPY . .

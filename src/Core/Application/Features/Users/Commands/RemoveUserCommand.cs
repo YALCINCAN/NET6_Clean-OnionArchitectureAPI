@@ -26,13 +26,13 @@ namespace Application.Features.Users.Commands
         {
             private readonly IUserRepository _userRepository;
             private readonly IUnitOfWork _unitOfWork;
-            private readonly IEasyCacheService _easyCacheService;
+            private readonly ICacheService _cacheService;
 
-            public RemoveUserCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork, IEasyCacheService easyCacheService)
+            public RemoveUserCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork, ICacheService cacheService)
             {
                 _userRepository = userRepository;
                 _unitOfWork = unitOfWork;
-                _easyCacheService = easyCacheService;
+                _cacheService = cacheService;
             }
 
             public async Task<IResponse> Handle(RemoveUserCommand request, CancellationToken cancellationToken)
@@ -44,7 +44,7 @@ namespace Application.Features.Users.Commands
                 }
                 _userRepository.Remove(user);
                 await _unitOfWork.SaveChangesAsync();
-                await _easyCacheService.RemoveByPrefixAsync("GetAuthenticatedUserWithRoles");
+                await _cacheService.RemoveByPrefixAsync("GetAuthenticatedUserWithRoles");
                 return new SuccessResponse(200, Messages.DeletedSuccessfully);
             }
         }

@@ -5,12 +5,10 @@ using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using Application.Wrappers.Abstract;
 using Application.Wrappers.Concrete;
+using Common.Settings;
+using Domain.RabbitMessages;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 namespace Application.Features.Users.Commands
 {
@@ -23,11 +21,15 @@ namespace Application.Features.Users.Commands
             private readonly IUserRepository _userRepository;
             private readonly IUnitOfWork _unitOfWork;
             private readonly IEmailService _emailService;
-            public ForgetPasswordCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork, IEmailService emailService)
+            private readonly IRabbitService _rabbitService;
+            private readonly RabbitMQSettings _rabbitMQSettings;
+            public ForgetPasswordCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork, IEmailService emailService, IRabbitService rabbitService, IOptions<RabbitMQSettings> rabbitMQSettings)
             {
                 _userRepository = userRepository;
                 _unitOfWork = unitOfWork;
                 _emailService = emailService;
+                _rabbitService = rabbitService;
+                _rabbitMQSettings = rabbitMQSettings.Value;
             }
             public async Task<IResponse> Handle(ForgetPasswordCommand request, CancellationToken cancellationToken)
             {
@@ -39,7 +41,12 @@ namespace Application.Features.Users.Commands
                 user.ResetPasswordCode = PasswordHelper.GenerateRandomString(20);
                 await _unitOfWork.SaveChangesAsync();
                 string link = "http://localhost:5010/api/users/resetpassword/" + user.ResetPasswordCode + "/" + user.Email;
-                await _emailService.ForgetPasswordMailAsync(link, user.Email);
+                _rabbitService.Publish<ForgetPasswordMailSendMessage>
+                   (new ForgetPasswordMailSendMessage()
+                   { Email = request.Email, Link = link },
+                   _rabbitMQSettings.EmailSenderRabbitMQSettings.Exchange_Default,
+                   _rabbitMQSettings.EmailSenderRabbitMQSettings.ForgetPasswordMailRabbitMQSettings.Queue_ForgetPasswordMailSender);
+                //await _emailService.ForgetPasswordMailAsync(link, user.Email);
                 return new SuccessResponse(200, Messages.IfEmailTrue);
             }
         }

@@ -1,13 +1,8 @@
 ﻿using Application.Interfaces.Services;
+using Common.Settings;
 using Microsoft.Extensions.Options;
-using Infrastructure.Settings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Services
 {

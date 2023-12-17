@@ -20,13 +20,13 @@ namespace Application.Features.Roles.Commands
             private readonly IRoleRepository _roleRepository;
             private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
-            private readonly IEasyCacheService _easyCacheService;
+            private readonly ICacheService _cacheService;
 
-            public CreateRoleCommandHandler(IRoleRepository roleRepository, IUnitOfWork unitOfWork, IEasyCacheService easyCacheService, IMapper mapper)
+            public CreateRoleCommandHandler(IRoleRepository roleRepository, IUnitOfWork unitOfWork, ICacheService cacheService, IMapper mapper)
             {
                 _roleRepository = roleRepository;
                 _unitOfWork = unitOfWork;
-                _easyCacheService = easyCacheService;
+                _cacheService = cacheService;
                 _mapper = mapper;
             }
 
@@ -42,7 +42,7 @@ namespace Application.Features.Roles.Commands
                     Name = request.Name
                 });
                 await _unitOfWork.SaveChangesAsync();
-                await _easyCacheService.RemoveByPrefixAsync("GetAuthenticatedUserWithRoles");
+                await _cacheService.RemoveByPrefixAsync("GetAuthenticatedUserWithRoles");
                 var mappedrole = _mapper.Map<RoleDTO>(role);
                 return new DataResponse<RoleDTO>(mappedrole, 200, Messages.AddedSuccesfully);
             }

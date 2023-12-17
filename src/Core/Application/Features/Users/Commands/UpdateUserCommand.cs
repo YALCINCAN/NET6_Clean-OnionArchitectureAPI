@@ -23,14 +23,14 @@ namespace Application.Features.Users.Commands
             private readonly IUserRepository _userRepository;
             private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
-            private readonly IEasyCacheService _easyCacheService;
+            private readonly ICacheService _cacheService;
 
-            public UpdateUserCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork, IMapper mapper, IEasyCacheService easyCacheService)
+            public UpdateUserCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService)
             {
                 _userRepository = userRepository;
                 _unitOfWork = unitOfWork;
                 _mapper = mapper;
-                _easyCacheService = easyCacheService;
+                _cacheService = cacheService;
             }
 
             public async Task<IResponse> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
@@ -47,7 +47,7 @@ namespace Application.Features.Users.Commands
                 }
                 _mapper.Map(request, user);
                 await _unitOfWork.SaveChangesAsync();
-                await _easyCacheService.RemoveByPrefixAsync("GetAuthenticatedUserWithRoles");
+                await _cacheService.RemoveByPrefixAsync("GetAuthenticatedUserWithRoles");
                 return new SuccessResponse(200, Messages.UpdatedSuccessfully);
             }
         }

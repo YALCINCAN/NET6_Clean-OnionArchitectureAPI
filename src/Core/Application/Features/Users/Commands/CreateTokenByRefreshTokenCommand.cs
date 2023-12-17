@@ -20,16 +20,16 @@ namespace Application.Features.Users.Commands
             private readonly IRefreshTokenRepository _refreshTokenRepository;
             private readonly ITokenService _tokenService;
             private readonly IUnitOfWork _unitOfWork;
-            private readonly IEasyCacheService _easyCacheService;
+            private readonly ICacheService _cacheService;
 
-            public CreateTokenByRefreshTokenHandler(IUserRepository userRepository, IRefreshTokenRepository refreshTokenRepository, IUnitOfWork unitOfWork, ITokenService tokenService, IRoleRepository roleRepository, IEasyCacheService easyCacheService)
+            public CreateTokenByRefreshTokenHandler(IUserRepository userRepository, IRefreshTokenRepository refreshTokenRepository, IUnitOfWork unitOfWork, ITokenService tokenService, IRoleRepository roleRepository, ICacheService cacheService)
             {
                 _userRepository = userRepository;
                 _unitOfWork = unitOfWork;
                 _tokenService = tokenService;
                 _refreshTokenRepository = refreshTokenRepository;
                 _roleRepository = roleRepository;
-                _easyCacheService = easyCacheService;
+                _cacheService = cacheService;
             }
 
             public async Task<IResponse> Handle(CreateTokenByRefreshTokenCommand request, CancellationToken cancellationToken)
@@ -58,7 +58,7 @@ namespace Application.Features.Users.Commands
                 existRefreshToken.Code = tokendto.RefreshToken;
                 existRefreshToken.Expiration = tokendto.RefreshTokenExpiration;
                 await _unitOfWork.SaveChangesAsync();
-                await _easyCacheService.RemoveByPrefixAsync("GetAuthenticatedUserWithRoles");
+                await _cacheService.RemoveByPrefixAsync("GetAuthenticatedUserWithRoles");
                 return new DataResponse<TokenDTO>(tokendto, 200);
             }
         }

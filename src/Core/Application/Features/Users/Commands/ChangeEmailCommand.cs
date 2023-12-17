@@ -5,7 +5,10 @@ using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using Application.Wrappers.Abstract;
 using Application.Wrappers.Concrete;
+using Common.Settings;
+using Domain.RabbitMessages;
 using MediatR;
+using Microsoft.Extensions.Options;
 using System.Text.Json.Serialization;
 
 namespace Application.Features.Users.Commands
@@ -28,14 +31,18 @@ namespace Application.Features.Users.Commands
             private readonly IUserRepository _userRepository;
             private readonly IUnitOfWork _unitOfWork;
             private readonly IEmailService _emailService;
-            private readonly IEasyCacheService _easyCacheService;
+            private readonly IRabbitService _rabbitService;
+            private readonly RabbitMQSettings _rabbitMQSettings;
+            private readonly ICacheService _cacheService;
 
-            public ChangeEmailCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork, IEmailService emailService, IEasyCacheService easyCacheService)
+            public ChangeEmailCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork, IEmailService emailService, ICacheService cacheService, IRabbitService rabbitService, IOptions<RabbitMQSettings> rabbitMQSettings)
             {
                 _userRepository = userRepository;
                 _unitOfWork = unitOfWork;
                 _emailService = emailService;
-                _easyCacheService = easyCacheService;
+                _cacheService = cacheService;
+                _rabbitService = rabbitService;
+                _rabbitMQSettings = rabbitMQSettings.Value;
             }
 
             public async Task<IResponse> Handle(ChangeEmailCommand request, CancellationToken cancellationToken)
@@ -56,8 +63,13 @@ namespace Application.Features.Users.Commands
                 user.EmailConfirmationCode = PasswordHelper.GenerateRandomString(20);
                 await _unitOfWork.SaveChangesAsync();
                 string link = "http://localhost:5010/api/users/confirmemail/" + user.EmailConfirmationCode;
-                await _emailService.ConfirmationMailAsync(link, request.Email);
-                await _easyCacheService.RemoveByPrefixAsync("GetAuthenticatedUserWithRoles");
+                //await _emailService.ConfirmationMailAsync(link, request.Email);
+                _rabbitService.Publish<ConfirmationMailSendMessage>
+                   (new ConfirmationMailSendMessage()
+                   { Email = request.Email, Link = link },
+                   _rabbitMQSettings.EmailSenderRabbitMQSettings.Exchange_Default,
+                   _rabbitMQSettings.EmailSenderRabbitMQSettings.ConfirmationMailRabbitMQSettings.Queue_ConfirmationMailSender);
+                await _cacheService.RemoveByPrefixAsync("GetAuthenticatedUserWithRoles");
                 return new SuccessResponse(200, Messages.EmailSuccessfullyChangedConfirmYourEmail);
             }
         }

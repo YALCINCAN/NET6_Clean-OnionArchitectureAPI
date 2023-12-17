@@ -1,15 +1,16 @@
 ﻿using Application.Interfaces.Services;
-using EasyCaching.Core.Configurations;
+using Common.Settings;
+using Infrastructure.MqManager;
 using Infrastructure.Services;
-using Infrastructure.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
 
 namespace Infrastructure
 {
     public static class InfrastructureRegistration
     {
-        public static void AddInfrastructureServices(this IServiceCollection services,IConfiguration configuration)
+        public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ITokenService, TokenService>();
@@ -17,27 +18,36 @@ namespace Infrastructure
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.Configure<CacheSettings>(configuration.GetSection("CacheSettings"));
 
+            services.Configure<RabbitMQSettings>(configuration.GetSection("RabbitMQSettings"));
+
+
+            services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
+            services.AddSingleton<RabbitModelPooledObjectPolicy>();
+            services.AddSingleton<IRabbitService, RabbitManager>();
+
+
             var cacheSettings = configuration.GetSection("CacheSettings").Get<CacheSettings>();
+            var rsettings = configuration.GetSection("RabbitMQSettings").Get<RabbitMQSettings>();
 
             if (cacheSettings.PreferRedis)
             {
-                services.AddEasyCaching(option =>
+                services.AddStackExchangeRedisCache(options =>
                 {
-                    option.WithJson();
-                    option.UseRedis(config =>
+                    options.Configuration = cacheSettings.RedisURL;
+                    options.ConfigurationOptions = new StackExchange.Redis.ConfigurationOptions()
                     {
-                        config.DBConfig.Endpoints.Add(new ServerEndPoint(cacheSettings.RedisURL, cacheSettings.RedisPort));
-                    }, "json");
+                        AbortOnConnectFail = true,
+                        EndPoints = { cacheSettings.RedisURL }
+                    };
                 });
+                services.AddTransient<ICacheService, RedisCacheService>();
             }
             else
             {
-                services.AddEasyCaching(option =>
-                {
-                    option.UseInMemory();
-                });
+                services.AddMemoryCache();
+                services.AddTransient<ICacheService, MemoryCacheService>();
             }
-            services.AddTransient<IEasyCacheService, EasyCacheService>();
         }
+
     }
 }

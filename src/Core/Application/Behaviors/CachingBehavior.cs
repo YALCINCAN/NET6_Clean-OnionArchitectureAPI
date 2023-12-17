@@ -7,12 +7,12 @@ namespace Application.Behaviors
 {
     public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
-        private readonly IEasyCacheService _easyCacheService;
+        private readonly ICacheService _cacheService;
         private readonly ILogger<CachingBehavior<TRequest, TResponse>> _logger;
 
-        public CachingBehavior(IEasyCacheService easyCacheService, ILogger<CachingBehavior<TRequest, TResponse>> logger)
+        public CachingBehavior(ICacheService cacheService, ILogger<CachingBehavior<TRequest, TResponse>> logger)
         {
-            _easyCacheService = easyCacheService;
+            _cacheService = cacheService;
             _logger = logger;
         }
 
@@ -26,10 +26,10 @@ namespace Application.Behaviors
                 {
                     response = await next();
 
-                    await _easyCacheService.SetAsync<TResponse>((string)cacheableQuery.CacheKey, response);
+                    await _cacheService.SetAsync<TResponse>((string)cacheableQuery.CacheKey, response);
                     return response;
                 }
-                var cachedResponse = await _easyCacheService.GetAsync(cacheableQuery.CacheKey, typeof(TResponse));
+                var cachedResponse = await _cacheService.GetAsync<TResponse>(cacheableQuery.CacheKey);
                 if (cachedResponse != null)
                 {
                     response = (TResponse)cachedResponse;

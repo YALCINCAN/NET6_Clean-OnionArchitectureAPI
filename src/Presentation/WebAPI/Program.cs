@@ -1,25 +1,33 @@
 using Application;
-using FluentValidation.AspNetCore;
 using Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using NpgsqlTypes;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Persistence;
 using Persistence.Context;
 using Serilog;
-using Serilog.Sinks.PostgreSQL;
 using WebAPI.Infrastructure.Extensions;
-using WebAPI.Infrastructure.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers(options =>
+
+
+//builder.Services.AddControllers(options =>
+//{
+//    options.Filters.Add(typeof(ValidationFilter));
+//}).AddFluentValidation();
+
+
+
+builder.Services.AddControllers().AddNewtonsoftJson(opts =>
 {
-    options.Filters.Add(typeof(ValidationFilter));
-}).AddFluentValidation();
+    opts.SerializerSettings.Converters.Add(new StringEnumConverter());
+    opts.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 

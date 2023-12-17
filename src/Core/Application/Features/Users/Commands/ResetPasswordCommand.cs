@@ -5,12 +5,10 @@ using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using Application.Wrappers.Abstract;
 using Application.Wrappers.Concrete;
+using Common.Settings;
+using Domain.RabbitMessages;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 namespace Application.Features.Users.Commands
 {
@@ -30,12 +28,16 @@ namespace Application.Features.Users.Commands
             private readonly IUserRepository _userRepository;
             private readonly IUnitOfWork _unitOfWork;
             private readonly IEmailService _emailService;
+            private readonly IRabbitService _rabbitService;
+            private readonly RabbitMQSettings _rabbitMQSettings;
 
-            public ResetPasswordCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork, IEmailService emailService)
+            public ResetPasswordCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork, IEmailService emailService, IRabbitService rabbitService, IOptions<RabbitMQSettings> rabbitMQSettings)
             {
                 _userRepository = userRepository;
                 _unitOfWork = unitOfWork;
                 _emailService = emailService;
+                _rabbitService = rabbitService;
+                _rabbitMQSettings = rabbitMQSettings.Value;
             }
 
             public async Task<IResponse> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
@@ -57,7 +59,12 @@ namespace Application.Features.Users.Commands
                 user.PasswordSalt = passwordSalt;
                 user.ResetPasswordCode = null;
                 await _unitOfWork.SaveChangesAsync();
-                await _emailService.SendNewPasswordAsync(newPassword, user.Email);
+                _rabbitService.Publish<ResetPasswordMailSendMessage>
+                  (new ResetPasswordMailSendMessage()
+                  { Email = request.Email, NewPassword = newPassword },
+                  _rabbitMQSettings.EmailSenderRabbitMQSettings.Exchange_Default,
+                  _rabbitMQSettings.EmailSenderRabbitMQSettings.ResetPasswordMailRabbitMQSettings.Queue_ResetPasswordMailSender);
+                //await _emailService.SendNewPasswordAsync(newPassword, user.Email);
                 return new SuccessResponse(200, Messages.PasswordSuccessfullyReset);
             }
         }

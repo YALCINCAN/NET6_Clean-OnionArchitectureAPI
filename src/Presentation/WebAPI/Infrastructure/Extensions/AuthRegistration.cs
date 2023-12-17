@@ -1,13 +1,13 @@
-﻿using Infrastructure.Settings;
+﻿using Common.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 namespace WebAPI.Infrastructure.Extensions
 {
-    public static class  AuthRegistration
+    public static class AuthRegistration
     {
-        public static void ConfigureAuth(this IServiceCollection services,IConfiguration configuration)
+        public static void ConfigureAuth(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddAuthentication(options =>
             {

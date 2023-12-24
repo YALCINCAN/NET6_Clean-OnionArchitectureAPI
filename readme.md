@@ -43,5 +43,6 @@ Username : admin
 Password : 159357456qW
 ```
 
+# New features added [Go](https://github.com/YALCINCAN/NET6_Clean-OnionArchitectureAPI/tree/v2)
 
 

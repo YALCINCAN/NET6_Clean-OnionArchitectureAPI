@@ -2,18 +2,16 @@
 
 <img alt="CleanArchitecture" src="assets/cleanarch.png"> </img>
 
-## Features
+## Features (V2 branch)
 - .NET6
 - Entity Framework Core – Code First
 - Repository Pattern
 - UnitOfWork Pattern
 - CQRS Pattern
 - Mediatr
-- CQRS Pipeline Caching (Redis,InMemory configure from appsettings.json file)
+- CQRS Pipeline Caching (Redis,InMemory configure from appsettings.json file),Validation(Fluent Validation),Logging (Request-Response)
 - Response Wrappers
-- Fluent Validation
-- Validation Filter 
-- Serilog Logging 
+- Serilog
 - Automapper
 - Docker
 - JWT Authentication,Refresh Token
@@ -21,6 +19,7 @@
 - Role Based Authorization
 - Database Seeding
 - Custom Exception Handling Middleware
+- RabbitMQ for Send Mail operations
 
 
 ## How To Start .Net API

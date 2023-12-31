@@ -1,5 +1,5 @@
 # NET6 Clean-Onion Architecture Project
-
+# New features added [v2 branch] (https://github.com/YALCINCAN/NET6_Clean-OnionArchitectureAPI/tree/v2)
 <img alt="CleanArchitecture" src="assets/cleanarch.png"> </img>
 
 ## Features
@@ -43,6 +43,6 @@ Username : admin
 Password : 159357456qW
 ```
 
-# New features added [Go](https://github.com/YALCINCAN/NET6_Clean-OnionArchitectureAPI/tree/v2)
+
 
 

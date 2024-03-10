@@ -15,7 +15,7 @@ namespace Application.BackgroundServices
     public class ConfirmationMailSenderBackgroundService : BackgroundService
     {
         private IConnection _connection;
-        private IModel _channel;
+        //private IModel _channel;
         private IConnectionFactory _connectionFactory;
         private readonly RabbitMQSettings _rabbitMqSettings;
         private readonly ILogger<ConfirmationMailSenderBackgroundService> _logger;
@@ -36,8 +36,8 @@ namespace Application.BackgroundServices
                 Port = _rabbitMqSettings.Port,
             };
             _connection = _connectionFactory.CreateConnection();
-            _channel = _connection.CreateModel();
-            InitRabbitMQDeclarations();
+            //_channel = _connection.CreateModel();
+            //InitRabbitMQDeclarations();
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -45,7 +45,9 @@ namespace Application.BackgroundServices
             for (int i = 0; i < _rabbitMqSettings.EmailSenderRabbitMQSettings.ConfirmationMailRabbitMQSettings.ConsumerCount_ConfirmationMailSender; i++)
             {
                 _logger.LogInformation("ConfirmationMailSenderBackgroundService Running");
+                var _channel = _connection.CreateModel();
                 var consumer = new EventingBasicConsumer(_channel);
+                InitRabbitMQDeclarations(_channel);
                 consumer.Received += async (ch, ea) =>
                 {
                     try
@@ -78,8 +80,9 @@ namespace Application.BackgroundServices
         }
 
 
-        private void InitRabbitMQDeclarations()
+        private void InitRabbitMQDeclarations(IModel _channel)
         {
+            _channel.BasicQos(0, 1, false);
             _channel.ExchangeDeclare(exchange: _rabbitMqSettings.EmailSenderRabbitMQSettings.Exchange_Default, type: ExchangeType.Topic, durable: true);
             _channel.QueueDeclare(queue: _rabbitMqSettings.EmailSenderRabbitMQSettings.ConfirmationMailRabbitMQSettings.Queue_ConfirmationMailSender, durable: true, exclusive: false, autoDelete: false);
             _channel.QueueBind(queue: _rabbitMqSettings.EmailSenderRabbitMQSettings.ConfirmationMailRabbitMQSettings.Queue_ConfirmationMailSender, exchange: _rabbitMqSettings.EmailSenderRabbitMQSettings.Exchange_Default, routingKey: _rabbitMqSettings.EmailSenderRabbitMQSettings.ConfirmationMailRabbitMQSettings.Queue_ConfirmationMailSender);

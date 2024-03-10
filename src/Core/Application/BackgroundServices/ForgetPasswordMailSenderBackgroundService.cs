@@ -15,7 +15,7 @@ namespace Application.BackgroundServices
     public class ForgetPasswordMailSenderBackgroundService : BackgroundService
     {
         private IConnection _connection;
-        private IModel _channel;
+        //private IModel _channel;
         private IConnectionFactory _connectionFactory;
         private readonly RabbitMQSettings _rabbitMqSettings;
         private readonly ILogger<ForgetPasswordMailSenderBackgroundService> _logger;
@@ -38,8 +38,8 @@ namespace Application.BackgroundServices
 
             _connection = _connectionFactory.CreateConnection();
 
-            _channel = _connection.CreateModel();
-            InitRabbitMQDeclarations();
+            //_channel = _connection.CreateModel();
+            //InitRabbitMQDeclarations();
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -47,7 +47,9 @@ namespace Application.BackgroundServices
             for (int i = 0; i < _rabbitMqSettings.EmailSenderRabbitMQSettings.ForgetPasswordMailRabbitMQSettings.ConsumerCount_ForgetPasswordMailSender; i++)
             {
                 _logger.LogInformation("ForgetPasswordMailSenderBackgroundService Running");
+                var _channel = _connection.CreateModel();
                 var consumer = new EventingBasicConsumer(_channel);
+                InitRabbitMQDeclarations(_channel);
                 consumer.Received += async (ch, ea) =>
                 {
                     try
@@ -80,7 +82,7 @@ namespace Application.BackgroundServices
         }
 
 
-        private void InitRabbitMQDeclarations()
+        private void InitRabbitMQDeclarations(IModel _channel)
         {
             _channel.ExchangeDeclare(exchange: _rabbitMqSettings.EmailSenderRabbitMQSettings.Exchange_Default, type: ExchangeType.Topic, durable: true);
             _channel.QueueDeclare(queue: _rabbitMqSettings.EmailSenderRabbitMQSettings.ForgetPasswordMailRabbitMQSettings.Queue_ForgetPasswordMailSender, durable: true, exclusive: false, autoDelete: false);

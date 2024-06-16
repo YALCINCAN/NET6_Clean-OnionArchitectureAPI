@@ -1,5 +1,6 @@
 # NET6 Clean-Onion Architecture Project
 # New features added [v2 branch](https://github.com/YALCINCAN/NET6_Clean-OnionArchitectureAPI/tree/v2)
+# New features added [v3 branch](https://github.com/YALCINCAN/NET6_Clean-OnionArchitectureAPI/tree/v3)
 <img alt="CleanArchitecture" src="assets/cleanarch.png"> </img>
 
 ## Features

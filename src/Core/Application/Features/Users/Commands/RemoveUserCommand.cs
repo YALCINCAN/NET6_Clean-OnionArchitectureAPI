@@ -40,7 +40,7 @@ namespace Application.Features.Users.Commands
                 var user = await _userRepository.GetByIdAsync(request.UserId);
                 if (user == null)
                 {
-                    throw new ApiException(404, Messages.UserNotFound);
+                    return new ErrorResponse(404, Messages.UserNotFound);
                 }
                 _userRepository.Remove(user);
                 await _unitOfWork.SaveChangesAsync();

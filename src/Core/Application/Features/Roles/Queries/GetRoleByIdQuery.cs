@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Application.Features.Roles.Queries
 {
-    public class GetRoleByIdQuery : IRequest<DataResponse<RoleDTO>>
+    public class GetRoleByIdQuery : IRequest<IResponse>
     {
         public Guid Id { get; set; }
 
@@ -19,7 +19,7 @@ namespace Application.Features.Roles.Queries
             Id = id;
         }
 
-        public class GetRoleByIdQueryHandler : IRequestHandler<GetRoleByIdQuery, DataResponse<RoleDTO>>
+        public class GetRoleByIdQueryHandler : IRequestHandler<GetRoleByIdQuery, IResponse>
         {
             private readonly IRoleRepository _roleRepository;
             private readonly IMapper _mapper;
@@ -30,12 +30,12 @@ namespace Application.Features.Roles.Queries
                 _mapper = mapper;
             }
 
-            public async Task<DataResponse<RoleDTO>> Handle(GetRoleByIdQuery request, CancellationToken cancellationToken)
+            public async Task<IResponse> Handle(GetRoleByIdQuery request, CancellationToken cancellationToken)
             {
                 var role = await _roleRepository.GetByIdAsync(request.Id);
                 if (role == null)
                 {
-                    throw new ApiException(404, Messages.NotFound);
+                    return new ErrorResponse(404, Messages.NotFound);
                 }
                 var mappedrole = _mapper.Map<RoleDTO>(role);
                 return new DataResponse<RoleDTO>(mappedrole, 200);

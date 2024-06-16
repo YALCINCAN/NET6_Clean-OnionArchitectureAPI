@@ -11,6 +11,7 @@
 - Mediatr
 - CQRS Pipeline Caching (Redis,InMemory configure from appsettings.json file),Validation(Fluent Validation),Logging (Request-Response)
 - Response Wrappers
+- Validation Filter For FluentValidation Errors
 - Serilog
 - Automapper
 - Docker

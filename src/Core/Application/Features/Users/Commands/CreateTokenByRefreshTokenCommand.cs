@@ -37,16 +37,16 @@ namespace Application.Features.Users.Commands
                 var existRefreshToken = await _refreshTokenRepository.GetAsync(x => x.Code == request.RefreshToken);
                 if (existRefreshToken == null)
                 {
-                    throw new ApiException(404, Messages.RefreshTokenNotFound);
+                    return new ErrorResponse(404, Messages.RefreshTokenNotFound);
                 }
                 var user = await _userRepository.GetByIdAsync(existRefreshToken.UserId);
                 if (user == null)
                 {
-                    throw new ApiException(404, Messages.UserNotFound);
+                    return new ErrorResponse(404, Messages.UserNotFound);
                 }
                 if (existRefreshToken.Expiration < DateTime.Now)
                 {
-                    throw new ApiException(404, Messages.RefreshTokenExpired);
+                    return new ErrorResponse(404, Messages.RefreshTokenExpired);
                 }
                 var roles = await _roleRepository.GetAllAsync(x => x.UserRoles.Any(y => y.UserId == user.Id));
                 List<string> roleNames = new List<string>();

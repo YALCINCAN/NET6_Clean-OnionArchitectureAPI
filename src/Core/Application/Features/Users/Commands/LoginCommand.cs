@@ -39,15 +39,15 @@ namespace Application.Features.Users.Commands
                 var user = await _userRepository.GetAsync(x => x.UserName == request.UserName, noTracking: true);
                 if (user == null)
                 {
-                    throw new ApiException(404, Messages.UserNotFound);
+                    return new ErrorResponse(404, Messages.UserNotFound);
                 }
                 if (!user.EmailConfirmed)
                 {
-                    throw new ApiException(400, Messages.ConfirmYourEmail);
+                    return new ErrorResponse(400, Messages.ConfirmYourEmail);
                 }
                 if (!PasswordHelper.VerifyHash(request.Password, user.PasswordHash, user.PasswordSalt))
                 {
-                    throw new ApiException(400, Messages.UserNameOrPasswordIsIncorrect);
+                    return new ErrorResponse(400, Messages.UserNameOrPasswordIsIncorrect);
                 }
                 var roles = await _roleRepository.GetAllAsync(x => x.UserRoles.Any(y => y.UserId == user.Id));
                 List<string> roleNames = new List<string>();

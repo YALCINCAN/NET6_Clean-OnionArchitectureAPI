@@ -4,6 +4,7 @@ using Application.Wrappers.Abstract;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Infrastructure.Extensions;
 
 namespace WebAPI.Controllers
 {
@@ -21,39 +22,39 @@ namespace WebAPI.Controllers
 
 
         [HttpGet]
-        public async Task<IResponse> GetRoles()
+        public async Task<IActionResult> GetRoles()
         {
-            return await _mediator.Send(new GetAllRolesQuery());
+            return this.FromResponse<IResponse>(await _mediator.Send(new GetAllRolesQuery()));
         }
 
         [HttpGet("{id}")]
-        public async Task<IResponse> GetRole(Guid id)
+        public async Task<IActionResult> GetRole(Guid id)
         {
-            return await _mediator.Send(new GetRoleByIdQuery(id));
+            return this.FromResponse<IResponse>(await _mediator.Send(new GetRoleByIdQuery(id)));
         }
 
         [HttpPost]
-        public async Task<IResponse> CreateRole(CreateRoleCommand command)
+        public async Task<IActionResult> CreateRole(CreateRoleCommand command)
         {
-            return await _mediator.Send(command);
+            return this.FromResponse<IResponse>(await _mediator.Send(command));
         }
 
         [HttpPut]
-        public async Task<IResponse> UpdateRole(UpdateRoleCommand command)
+        public async Task<IActionResult> UpdateRole(UpdateRoleCommand command)
         {
-            return await _mediator.Send(command);
+            return this.FromResponse<IResponse>(await _mediator.Send(command));
         }
 
         [HttpDelete("{id}")]
-        public async Task<IResponse> RemoveRole(Guid id)
+        public async Task<IActionResult> RemoveRole(Guid id)
         {
-            return await _mediator.Send(new RemoveRoleCommand(id));
+            return this.FromResponse<IResponse>(await _mediator.Send(new RemoveRoleCommand(id)));
         }
 
         [HttpGet("getrolesbyuserid/{userid}")]
-        public async Task<IResponse> GetRolesByUserId(Guid userid)
+        public async Task<IActionResult> GetRolesByUserId(Guid userid)
         {
-            return await _mediator.Send(new GetRolesByUserIdQuery(userid));
+            return this.FromResponse<IResponse>(await _mediator.Send(new GetRolesByUserIdQuery(userid)));
         }
     }
 }

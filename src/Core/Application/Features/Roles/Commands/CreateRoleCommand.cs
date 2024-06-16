@@ -35,7 +35,7 @@ namespace Application.Features.Roles.Commands
                 var existrole = await _roleRepository.GetAsync(x => x.Name == request.Name);
                 if (existrole != null)
                 {
-                    throw new ApiException(400, Messages.RoleNameAlreadyExist);
+                    return new ErrorResponse(400, Messages.RoleNameAlreadyExist);
                 }
                 var role = await _roleRepository.AddAsync(new Role()
                 {

@@ -39,11 +39,11 @@ namespace Application.Features.Users.Commands
                 var user = await _userRepository.GetByIdAsync(request.UserId);
                 if (user == null)
                 {
-                    throw new ApiException(404, Messages.UserNotFound);
+                    return new ErrorResponse(404, Messages.UserNotFound);
                 }
                 if (request.NewPassword != request.ConfirmPassword)
                 {
-                    throw new ApiException(400, Messages.PasswordDontMatchWithConfirmation);
+                    return new ErrorResponse(400, Messages.PasswordDontMatchWithConfirmation);
                 }
                 if (!PasswordHelper.VerifyHash(request.CurrentPassword, user.PasswordHash, user.PasswordSalt))
                 {

@@ -3,12 +3,13 @@ using Application.Dtos;
 using Application.Exceptions;
 using Application.Interfaces;
 using Application.Interfaces.Repositories;
+using Application.Wrappers.Abstract;
 using Application.Wrappers.Concrete;
 using MediatR;
 
 namespace Application.Features.Users.Queries
 {
-    public class GetAuthenticatedUserWithRolesQuery : IRequest<DataResponse<UserDTO>>, ICacheable
+    public class GetAuthenticatedUserWithRolesQuery : IRequest<IResponse>, ICacheable
     {
         public Guid UserId { get; set; }
 
@@ -21,7 +22,7 @@ namespace Application.Features.Users.Queries
             UserId = userId;
         }
 
-        public class GetAuthenticatedUserWithRolesQueryHandler : IRequestHandler<GetAuthenticatedUserWithRolesQuery, DataResponse<UserDTO>>
+        public class GetAuthenticatedUserWithRolesQueryHandler : IRequestHandler<GetAuthenticatedUserWithRolesQuery, IResponse>
         {
             private readonly IUserRepository _userRepository;
 
@@ -30,12 +31,12 @@ namespace Application.Features.Users.Queries
                 _userRepository = userRepository;
             }
 
-            public async Task<DataResponse<UserDTO>> Handle(GetAuthenticatedUserWithRolesQuery request, CancellationToken cancellationToken)
+            public async Task<IResponse> Handle(GetAuthenticatedUserWithRolesQuery request, CancellationToken cancellationToken)
             {
                 var user = await _userRepository.GetByIdAsync(request.UserId);
                 if (user == null)
                 {
-                    throw new ApiException(404, Messages.UserNotFound);
+                    return new ErrorResponse(404, Messages.UserNotFound);
                 }
                 var userwithroles = await _userRepository.GetUserWithRolesAsync(request.UserId);
                 return new DataResponse<UserDTO>(userwithroles, 200);

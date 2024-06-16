@@ -35,12 +35,12 @@ namespace Application.Features.Roles.Commands
                 var existrole = await _roleRepository.GetByIdAsync(request.Id);
                 if (existrole == null)
                 {
-                    throw new ApiException(404, Messages.NotFound);
+                    return new ErrorResponse(404, Messages.NotFound);
                 }
                 var roleName = await _roleRepository.GetAsync(x => x.Name == request.Name);
                 if (roleName != null && existrole.Name != request.Name)
                 {
-                    throw new ApiException(400, Messages.RoleNameAlreadyExist);
+                    return new ErrorResponse(400, Messages.RoleNameAlreadyExist);
                 }
                 _mapper.Map(request, existrole);
                 await _unitOfWork.SaveChangesAsync();

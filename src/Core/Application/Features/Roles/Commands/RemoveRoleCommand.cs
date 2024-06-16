@@ -35,7 +35,7 @@ namespace Application.Features.Roles.Commands
                 var exisrole = await _roleRepository.GetByIdAsync(request.Id);
                 if (exisrole == null)
                 {
-                    throw new ApiException(404, Messages.NotFound);
+                    return new ErrorResponse(404,Messages.RoleNameAlreadyExist);
                 }
                 _roleRepository.Remove(exisrole);
                 await _unitOfWork.SaveChangesAsync();

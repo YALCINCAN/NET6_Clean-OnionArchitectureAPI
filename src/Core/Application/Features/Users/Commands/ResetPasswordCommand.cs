@@ -45,12 +45,12 @@ namespace Application.Features.Users.Commands
                 var user = await _userRepository.GetAsync(x => x.Email == request.Email);
                 if (user == null)
                 {
-                    throw new ApiException(404, Messages.UserNotFound);
+                    return new ErrorResponse(404, Messages.UserNotFound);
                 }
                 var controlcode = await _userRepository.GetAsync(x => x.ResetPasswordCode == request.ResetPasswordCode);
                 if (controlcode == null)
                 {
-                    throw new ApiException(400, Messages.ResetPasswordCodeInvalid);
+                    return new ErrorResponse(400, Messages.ResetPasswordCodeInvalid);
                 }
 
                 var newPassword = PasswordHelper.GenerateRandomString(8);

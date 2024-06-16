@@ -31,11 +31,11 @@ namespace Application.Features.Users.Commands
                 var user = await _userRepository.GetAsync(x => x.EmailConfirmationCode == request.EmailConfirmationCode || x.EmailConfirmedCode == request.EmailConfirmationCode);
                 if (user == null)
                 {
-                    throw new ApiException(404, Messages.UserNotFound);
+                    return new ErrorResponse(404, Messages.UserNotFound);
                 }
                 if (user.EmailConfirmed)
                 {
-                    throw new ApiException(400, Messages.AlreadyEmailConfirmed);
+                    return new ErrorResponse(400, Messages.AlreadyEmailConfirmed);
                 }
                 user.EmailConfirmed = true;
                 user.EmailConfirmationCode = null;

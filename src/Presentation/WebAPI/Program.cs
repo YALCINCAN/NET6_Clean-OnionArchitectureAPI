@@ -1,4 +1,5 @@
 using Application;
+using FluentValidation.AspNetCore;
 using Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,9 @@ using Newtonsoft.Json.Converters;
 using Persistence;
 using Persistence.Context;
 using Serilog;
+using System.Text.Json.Serialization;
 using WebAPI.Infrastructure.Extensions;
+using WebAPI.Infrastructure.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,10 +19,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 
-//builder.Services.AddControllers(options =>
-//{
-//    options.Filters.Add(typeof(ValidationFilter));
-//}).AddFluentValidation();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add(typeof(ValidationFilter));
+}).AddFluentValidation().AddNewtonsoftJson(opts =>
+{
+    opts.SerializerSettings.Converters.Add(new StringEnumConverter());
+    opts.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+})
+.AddJsonOptions(opts => opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 
 

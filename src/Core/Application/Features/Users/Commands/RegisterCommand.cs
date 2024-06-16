@@ -50,12 +50,12 @@ namespace Application.Features.Users.Commands
                 //{
                 var existuser = await _userRepository.GetAsync(x => x.UserName == request.UserName || x.Email == request.Email, noTracking: true);
                 if (existuser?.UserName == request.UserName)
-                    throw new ApiException(400, Messages.UsernameIsAlreadyExist);
+                    return new ErrorResponse(400, Messages.UsernameIsAlreadyExist);
 
                 if (existuser?.Email == request.Email)
-                    throw new ApiException(400, Messages.EmailIsAlreadyExist);
+                    return new ErrorResponse(400, Messages.EmailIsAlreadyExist);
 
-
+              
                 var (passwordHash, passwordSalt) = PasswordHelper.CreateHash(request.Password);
                 var user = _mapper.Map<User>(request);
                 user.PasswordHash = passwordHash;

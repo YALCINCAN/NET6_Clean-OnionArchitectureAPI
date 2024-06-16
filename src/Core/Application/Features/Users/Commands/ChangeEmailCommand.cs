@@ -50,12 +50,12 @@ namespace Application.Features.Users.Commands
                 var user = await _userRepository.GetByIdAsync(request.UserId);
                 if (user == null)
                 {
-                    throw new ApiException(404, Messages.UserNotFound);
+                    return new ErrorResponse(404, Messages.UserNotFound);
                 }
                 var email = await _userRepository.GetAsync(x => x.Email == request.Email);
                 if (email != null && user.Email != request.Email)
                 {
-                    throw new ApiException(400, Messages.EmailIsAlreadyExist);
+                    return new ErrorResponse(400, Messages.EmailIsAlreadyExist);
                 }
                 user.Email = request.Email;
                 user.EmailConfirmed = false;

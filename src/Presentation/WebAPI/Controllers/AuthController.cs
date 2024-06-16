@@ -5,6 +5,7 @@ using Application.Wrappers.Abstract;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Infrastructure.Extensions;
 
 namespace WebAPI.Controllers
 {
@@ -23,27 +24,27 @@ namespace WebAPI.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IResponse> GetAuthenticatedUserWithRolesAsync()
+        public async Task<IActionResult> GetAuthenticatedUserWithRolesAsync()
         {
-            return await _mediator.Send(new GetAuthenticatedUserWithRolesQuery(UserId.Value));
+            return this.FromResponse<IResponse>(await _mediator.Send(new GetAuthenticatedUserWithRolesQuery(UserId.Value)));
         }
 
         [HttpPost("login")]
-        public async Task<IResponse> Login(LoginCommand command)
+        public async Task<IActionResult> Login(LoginCommand command)
         {
-            return await _mediator.Send(command);
+            return this.FromResponse<IResponse>(await _mediator.Send(command));
         }
 
         [HttpPost("register")]
-        public async Task<IResponse> Register(RegisterCommand command)
+        public async Task<IActionResult> Register(RegisterCommand command)
         {
-            return await _mediator.Send(command);
+            return this.FromResponse<IResponse>(await _mediator.Send(command));
         }
 
         [HttpPost("refreshtoken")]
-        public async Task<IResponse> RefreshToken(CreateTokenByRefreshTokenCommand command)
+        public async Task<IActionResult> RefreshToken(CreateTokenByRefreshTokenCommand command)
         {
-            return await _mediator.Send(command);
+            return this.FromResponse<IResponse>(await _mediator.Send(command));
         }
     }
 }

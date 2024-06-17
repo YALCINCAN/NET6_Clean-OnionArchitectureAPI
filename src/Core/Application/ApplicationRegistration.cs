@@ -19,7 +19,6 @@ namespace Application
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
-            //services.AddTransient(typeof(IRequestExceptionHandler<,,>), typeof(ExceptionHandler<,,>));
             services.AddHostedService<ConfirmationMailSenderBackgroundService>();
             services.AddHostedService<ForgetPasswordMailSenderBackgroundService>();
             services.AddHostedService<ResetPasswordMailSenderBackgroundService>();

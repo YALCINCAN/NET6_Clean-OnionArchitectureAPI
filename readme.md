@@ -2,7 +2,7 @@
 
 <img alt="CleanArchitecture" src="assets/cleanarch.png"> </img>
 
-## Features (V2 branch)
+## Features (V3 branch)
 - .NET6
 - Entity Framework Core – Code First
 - Repository Pattern

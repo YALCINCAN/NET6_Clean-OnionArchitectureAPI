@@ -1,3 +1,5 @@
+
+
 # NET6 Clean-Onion Architecture Project
 # New features added [v2 branch](https://github.com/YALCINCAN/NET6_Clean-OnionArchitectureAPI/tree/v2) / [v3 branch](https://github.com/YALCINCAN/NET6_Clean-OnionArchitectureAPI/tree/v3)
 # New features added 
@@ -37,13 +39,11 @@ When the project is up, the migrations run automatically
 
 After a database will be created. 
 
+The API is available at `http://localhost:5010`.
+
 Default Admin Account : 
 
 ```sh
 Username : admin
 Password : 159357456qW
 ```
-
-
-
-
